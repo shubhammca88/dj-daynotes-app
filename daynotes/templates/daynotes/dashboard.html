@@ -1,0 +1,97 @@
+{% extends 'daynotes/base.html' %}
+
+{% block title %}Dashboard - Daynotes App{% endblock %}
+
+{% block header %}Notes{% endblock %}
+
+{% block content %}
+<div class="notes-grid">
+    {% for note in notes %}
+        <div class="note-card-modern note-color-{{ forloop.counter0|add:1 }}" data-bs-toggle="modal" data-bs-target="#noteModal{{ note.id }}" style="cursor: pointer;">
+            <div class="note-content">
+                <h6 class="note-title">{{ note.title }}</h6>
+                <p class="note-preview">{{ note.body|truncatewords:12 }}</p>
+            </div>
+            <div class="note-footer">
+                <span class="note-date">{{ note.updated|date:"M j, Y" }}</span>
+                <div class="note-actions" onclick="event.stopPropagation();">
+                    <a href="#" class="note-action-btn" data-bs-toggle="modal" data-bs-target="#editModal{{ note.id }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'delete_note' note.id %}" class="note-action-btn text-danger">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-sticky-note fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No notes yet</h4>
+            <p class="text-muted">Create your first note to get started!</p>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Note Modals -->
+{% for note in notes %}
+<div class="modal fade" id="noteModal{{ note.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content note-color-{{ forloop.counter0|add:1 }}">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ note.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-plus"></i> {{ note.created|date:"M d, Y H:i" }} | 
+                        <i class="fas fa-calendar-alt"></i> {{ note.updated|date:"M d, Y H:i" }}
+                    </small>
+                </div>
+                <div style="white-space: pre-wrap;">{{ note.body }}</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ note.id }}" data-bs-dismiss="modal">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Edit Modals -->
+{% for note in notes %}
+<div class="modal fade" id="editModal{{ note.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content note-color-{{ forloop.counter0|add:1 }}">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'edit_note' note.id %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title{{ note.id }}" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title{{ note.id }}" name="title" value="{{ note.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="body{{ note.id }}" class="form-label">Content</label>
+                        <textarea class="form-control" id="body{{ note.id }}" name="body" rows="8">{{ note.body }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
