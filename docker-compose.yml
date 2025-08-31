@@ -1,3 +1,5 @@
+name: daynotes
+
 services:
   db:
     image: mysql:8.0
@@ -16,7 +18,7 @@ services:
       timeout: 20s
       retries: 10
 
-  daynotes-app:
+  app:
     build: .
     ports:
       - "8000:8000"
