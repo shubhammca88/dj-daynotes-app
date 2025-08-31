@@ -1,5 +1,3 @@
-name: daynotes
-
 services:
   db:
     image: mysql:8.0
@@ -19,7 +17,8 @@ services:
       retries: 10
 
   app:
-    build: .
+    build: .                           # image build by dockerfile if use docker hub remove build:
+    image: shubhammca88/daynotes:latest       # image taging or image build if dockerhub if not build 
     ports:
       - "8000:8000"
     environment:
